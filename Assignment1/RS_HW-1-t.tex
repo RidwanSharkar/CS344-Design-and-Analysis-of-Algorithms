@@ -1,0 +1,895 @@
+\documentclass{article}
+
+\setlength{\headsep}{0.75 in}
+\setlength{\parindent}{0 in}
+\setlength{\parskip}{0.1 in}
+
+%=====================================================
+% Add PACKAGES Here (You typically would not need to):
+%=====================================================
+
+\usepackage{xcolor}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amsthm}
+\usepackage{fancyhdr}
+\usepackage{enumitem}
+\usepackage{graphicx}
+
+%=====================================================
+% Ignore This Part (But Do NOT Delete It:)
+%=====================================================
+
+\theoremstyle{definition}
+\newtheorem{problem}{Problem}
+\newtheorem*{fun}{Fun with Algorithms}
+\newtheorem*{challenge}{Challenge Yourself}
+\def\fline{\rule{0.75\linewidth}{0.5pt}}
+\newcommand{\finishline}{\begin{center}\fline\end{center}}
+\newtheorem*{solution*}{Solution}
+\newenvironment{solution}{\begin{solution*}}{{\finishline} \end{solution*}}
+\newcommand{\grade}[1]{\hfill{\textbf{($\mathbf{#1}$ points)}}}
+\newcommand{\thisdate}{\today}
+\newcommand{\thissemester}{\textbf{Rutgers: Fall 2024}}
+\newcommand{\thiscourse}{CS 344: Design and Analysis of Computer Algorithms} 
+\newcommand{\thishomework}{Number} 
+\newcommand{\thisname}{Name} 
+\newcommand{\thisextension}{Yes/No} 
+
+\headheight 40pt              
+\headsep 10pt
+\renewcommand{\headrulewidth}{0pt}
+
+\pagestyle{fancy}
+
+\newcommand{\thisheading}{
+   \noindent
+   \begin{center}
+   \framebox{
+      \vbox{\vspace{2mm}
+    \hbox to 6.28in { \textbf{\thiscourse \hfill \thissemester} }
+       \vspace{4mm}
+       \hbox to 6.28in { {\Large \hfill Homework \#\thishomework \hfill} }
+       \vspace{2mm}
+         \hbox to 6.28in { { \hfill \hfill} }
+       \vspace{2mm}
+       \hbox to 6.28in { \emph{Name(s): \thisname \hfill }}
+      \vspace{2mm}}
+      }
+   \end{center}
+   \bigskip
+}
+
+%=====================================================
+% Some useful MACROS (you can define your own in the same exact way also)
+%=====================================================
+
+
+\newcommand{\ceil}[1]{{\left\lceil{#1}\right\rceil}}
+\newcommand{\floor}[1]{{\left\lfloor{#1}\right\rfloor}}
+\newcommand{\prob}[1]{\Pr\paren{#1}}
+\newcommand{\expect}[1]{\Exp\bracket{#1}}
+\newcommand{\var}[1]{\textnormal{Var}\bracket{#1}}
+\newcommand{\set}[1]{\ensuremath{\left\{ #1 \right\}}}
+\newcommand{\poly}{\mbox{\rm poly}}
+
+
+%=====================================================
+% Fill Out This Part With Your Own Information:
+%=====================================================
+
+
+\renewcommand{\thishomework}{1} %Homework number
+\renewcommand{\thisname}{FIRST$_1$ LAST$_1$, FIRST$_2$ LAST$_2$, FIRST$_3$ LAST$_3$} % Enter your name here
+
+
+\begin{document}
+
+\thisheading
+\vspace{-0.75cm}
+
+
+%=====================================================
+% LaTeX Tip: You can erase this part from here.... 
+%=====================================================		
+
+\subsection*{Homework Policy}
+\begin{itemize}
+\item If you leave a question completely blank, you will receive 20\% of the grade for that question. This however does not apply to the extra credit questions.
+
+
+\item You may also consult all the materials used in this course (lecture notes, textbook, slides, etc.) while writing your solution, but no other resources are allowed.
+\item Unless  specified otherwise, you may use any algorithm covered in class as a ``black box'' -- for example you can simply write ``sort the array in $\Theta(n\log{n})$ time using merge sort''.
+\item Remember to always \textbf{prove the correctness} of your algorithms and \textbf{analyze their running time} (or any other efficiency measure asked in the question). See ``Practice Homework'' for an example.  
+
+\item The extra credit problems are generally more challenging than the standard problems you see in this course (including lectures, homeworks, and exams). 
+As a general rule, only attempt to solve these problems if you  enjoy them. 
+\item \textbf{Groups:} You are allowed to form groups of size \emph{two} or \emph{three} students for solving each homework (you can also opt to do it alone if you prefer). The policy regarding groups is as follows: 
+\begin{itemize}
+\item You can pick different partners for different assignments (e.g., from HW1 to HW2) but for any single assignment (e.g., HW1), you have to use the same partners for all questions.  
+\item The members of each group only need to write down and submit a single assignment between them, and all of them will receive the same grade. 
+\item For submissions, only one member of the group submits the full solutions on Canvas and lists the name of their  partners in the group. The other members of the group also need to submit a PDF on Canvas that contains only a single line, stating the name
+of their partner who has submitted the full solution on Canvas (Example: Say $A$, $B$, and $C$ are in one group; $A$ submits the whole assignment and writes down the names $A$, $B$, and $C$. $B$ and $C$ only submit a one-page PDF with a single line that says ``See the solution of $A$''). 
+
+\item You are allowed to discuss the questions with any of your classmates even if they are not in your group. \textbf{But each group must write their solutions independently.} 
+\end{itemize}
+
+
+\end{itemize}
+
+\finishline
+
+\newpage
+
+%=====================================================
+% LaTeX Tip: ... to here
+%=====================================================	
+
+
+\bigskip
+
+\begin{problem}
+	This question reviews asymptotic notation. You may assume the following inequalities for this question (and throughout the course): For any \underline{constant} $c \geq 1$, 
+	\begin{align*}
+		(\log{n})^c = o(n) \quad,\quad n^c = o(n^{c+1}) \quad,\quad c^n = o((c+1)^n) \quad,\quad (n/2)^{(n/2)} = o(n!).
+	\end{align*}
+	\begin{enumerate}
+	\item[(a)] Rank the following functions based on their asymptotic value in the increasing order, i.e., list them as functions $f_1,f_2,f_3,\ldots,f_{9}$ such that $f_1 = O(f_2)$, $f_2 = O(f_3), \ldots, f_{8} = O(f_{9})$. Remember to write down your proof
+	for each equation $f_i = O(f_{i+1})$ in the sequence above.  \grade{15}
+	\begin{align*}
+		&\sqrt{{n}} &&\log{n} &&n^{{\log{n}}}  \\ 
+		&100n   &&2^{n} &&n! \\ 
+		&9^{n} && 3^{{3}^{{3}^{3}}} &&\frac{n}{\log^2{n}} 
+	\end{align*}
+	
+	\smallskip 
+	\emph{Hint:} For some of the proofs, you can simply show that $f_i(n) \leq f_{i+1}(n)$ for all \underline{sufficiently large} $n$ which immediately implies $f_i = O(f_{i+1})$. 
+%=====================================================
+% LaTeX Tip: Write your solutions for each problem in a solution environment, i.e., between a \begin{solution} and \end{solution} command. For problems that have multiple part, use this command right after each part
+% of the problem.  
+%=====================================================	
+
+\begin{solution}
+	Slowest to Fastest Growth:
+	\begin{enumerate}
+	\item $3^{3^{3^{3}}}$
+	\item $\log n$
+	\item $\sqrt{n}$
+	\item $\frac{n}{\log^2{n}}$
+	\item $100n$
+	\item $n^{\log n}$
+	\item $2^n$
+	\item $9^n$
+	\item $n!$
+	\end{enumerate}
+
+	Proofs:
+	\begin{itemize}
+	\item $3^{3^{3^{3}}}$ - Constant, doesn’t grow as n increases
+	\item $\log{n}$: Proof: $(\log{n})^c = o(n)$ for any constant $c \geq 1$. Let $c = 2$, then $(\log{n})^2 = o(n)$. This implies $\log{n} = o(\sqrt{n})$ > $\log{n} = O(\sqrt{n})$.
+	\item $\sqrt{n}$: Proof: $\sqrt{n}$ grows slower than $n$ but faster than $\log{n}$.
+	\item $\frac{n}{\log^2{n}}$: Proof: This grows slower than $n$ (due to division by $\log^2{n}$) but faster than $\sqrt{n}$. $\lim_{n \to \infty} \frac{n/\log^2{n}}{\sqrt{n}} = \lim_{n \to \infty} \frac{\sqrt{n}}{\log^2{n}} = \infty$.
+	\item $100n$: Proof: $100n = \Theta(n)$, as constant factors don't affect asymptotic growth.
+	\item $n^{\log{n}}$: Proof: $n^{\log{n}} = 2^{\log{n} \cdot \log{n}} = 2^{\log^2{n}}$, which grows faster than $n$ but slower than $2^n$.
+	\item $2^n$: Proof: Exponential growth, faster than polynomial ($n^k$ for any $k$) but slower than $3^n$.
+	\item $9^n$: Proof: $9^n = (3^2)^n = 3^{2n}$, which grows faster than $2^n$ but slower than $n!$.
+	\item $n!$: Proof: $n! > 9^n$ for sufficiently large $n$, so it grows faster than all previous functions.
+	\end{itemize}
+\end{solution}
+	
+	\item[(b)]  Consider the following four different functions $f(n)$: 
+	  \begin{align*}
+	    1 \qquad\qquad  \log\log{n} \qquad\qquad  n^2  \qquad\qquad 2^{2^{n}}.
+	  \end{align*} 
+	 For each of these functions, determine which of the following statements is true and which one is false. Remember to write down your proof for each choice.    \grade{10} 
+	\begin{itemize}
+        \item $f(n) = \Theta(f(n-1))$;
+        \item $f(n) = \Theta(f(\frac{n}{2}))$;
+        \item $f(n) = \Theta(f(\sqrt n))$;
+    \end{itemize}
+    
+    \smallskip
+	\textbf{Example:} For the function $f(n) = 2^{2^n}$, we have $f(n-1) = 2^{2^{n-1}}$.  Since $2^{2^{n-1}}= 2^{\frac{1}{2} \cdot 2^n} = (2^{2^{n}})^{1/2}$.
+	\[
+		\lim_{n \to \infty}\frac{f(n)}{f(n-1)} = \lim_{n \to \infty}\frac{2^{2^{n}}}{2^{2^{n-1}}} = \lim_{n \to \infty}\frac{2^{2^{n}}}{(2^{2^{n}})^{1/2}} = \lim_{n \to \infty}(2^{2^{n}})^{1/2} = +\infty.
+	\]	
+	As such, $f(n) \neq O(f(n-1))$ and thus the first statement is false for $2^{2^n}$.
+
+  
+    
+    \begin{solution}
+	\begin{itemize}
+		\item For $f(n) = 1$: 
+		\begin{itemize}
+		    \item $f(n) = \Theta(f(n-1))$: True \\
+		    Proof: $f(n) = f(n - 1) = 1$ for all $n$, so $\lim_{n \to \infty} \frac{f(n)}{f(n-1)} = 1$.
+		    \item $f(n) = \Theta(f(n/2))$: True \\
+		    Proof: $f(n) = f(n/2) = 1$ for all $n$, so $\lim_{n \to \infty} \frac{f(n)}{f(n/2)} = 1$.
+		    \item $f(n) = \Theta(f(\sqrt{n}))$: True \\
+		    Proof: $f(n) = f(\sqrt{n}) = 1$ for all $n$, so $\lim_{n \to \infty} \frac{f(n)}{f(\sqrt{n})} = 1$.
+		\end{itemize}
+	    
+		\item For $f(n) = \log \log n$: 
+		\begin{itemize}
+		    \item $f(n) = \Theta(f(n-1))$: True \\
+		    Proof: $\lim_{n \to \infty} \frac{\log \log n}{\log \log (n-1)} = 1$.
+		    \item $f(n) = \Theta(f(n/2))$: True \\
+		    Proof: $\lim_{n \to \infty} \frac{\log \log n}{\log \log (n/2)} = 1$.
+		    \item $f(n) = \Theta(f(\sqrt{n}))$: False \\
+		    Proof: $\lim_{n \to \infty} \frac{\log \log n}{\log \log (\sqrt{n})} = \lim_{n \to \infty} \frac{\log \log n}{\log (\frac{1}{2} \log n)} \neq \text{constant}$.
+		\end{itemize}
+	    
+		\item For $f(n) = n^2$: 
+		\begin{itemize}
+		    \item $f(n) = \Theta(f(n-1))$: True \\
+		    Proof: $\lim_{n \to \infty} \frac{n^2}{(n-1)^2} = 1$.
+		    \item $f(n) = \Theta(f(n/2))$: True \\
+		    Proof: $\frac{n^2}{(n/2)^2} = 4$.
+		    \item $f(n) = \Theta(f(\sqrt{n}))$: False \\
+		    Proof: $\frac{n^2}{(\sqrt{n})^2} = n$, which grows unbounded.
+		\end{itemize}
+	    
+		\item For $f(n) = 2^{2^n}$: 
+		\begin{itemize}
+		    \item $f(n) \neq \Theta(f(n-1))$: False \\
+		    Proof: \\
+		    \item $f(n) = \Theta(f(n/2))$: False \\
+		    Proof: $2^{2^n} / 2^{2^{(n/2)}} = 2^{2^n - 2^{(n/2)}}$ grows unbounded.
+		    \item $f(n) = \Theta(f(\sqrt{n}))$: False \\
+		    Proof: $2^{2^n} / 2^{2^{\sqrt{n}}}$ grows even faster.
+		\end{itemize}
+	    \end{itemize} 
+	\end{solution}
+
+
+\item[(b)] For each of the following functions, state whether $f(n) = O(g(n))$ or $f = \Omega(g(n))$, or if both are true, then write $f = \Theta(g(n))$. No proofs required for this problem.  \grade{10}
+\begin{enumerate}
+	\item $f(n) = n^2 - 7n$ and $g(n) = n^3 - 10n^2$
+	\item $f(n) = (\sqrt{n})^3$ and $g(n) = n^2 - (\sqrt{n})^3$
+	\item $f(n) = n^{log_3(4)}$ and $g(n) = n\log^3(n)$
+	\item $f(n) = 2^{\log_2(n)}$ and $g(n) = n$
+	\item $f(n) = log^5(n)$ and $g(n) = n/\log(n)$
+	\item $f(n) = 4^n$ and $g(n) = 5^n$
+	\item $f(n) = \log_4(n)$ and $g(n) = \log_5(n)$
+	\item $f(n) = n^3$ and $g(n) = 2^{n}$
+	\item $f(n) = \sqrt{n}$ and $g(n) = \log^3(n)$. 
+	\item $f(n) = n\log(n)$ and $g(n) = n^2$
+
+\end{enumerate}
+
+   
+    \begin{solution}
+	\begin{enumerate}[label=(\alph*)]
+		\item $f(n) = n^2 - 7n$ and $g(n) = n^3 - 10n^2$ \\
+		$f(n) = O(g(n))$
+		
+		\item $f(n) = (\sqrt{n})^3$ and $g(n) = n^2 - (\sqrt{n})^3$ \\
+		$f(n) = O(g(n))$
+		
+		\item $f(n) = n^{\log_3(4)}$ and $g(n) = n \log^3 (n)$ \\
+		$f(n) = \Omega(g(n))$
+		
+		\item $f(n) = 2^{\log_2 (n)}$ and $g(n) = n$ \\
+		$f(n) = \Theta(g(n))$
+		
+		\item $f(n) = \log^5 (n)$ and $g(n) = n/ \log(n)$ \\
+		$f(n) = O(g(n))$
+		
+		\item $f(n) = 4^n$ and $g(n) = 5^n$ \\
+		$f(n) = O(g(n))$
+		
+		\item $f(n) = \log_4 (n)$ and $g(n) = \log_5 (n)$ \\
+		$f(n) = \Theta(g(n))$
+		
+		\item $f(n) = n^3$ and $g(n) = 2^n$ \\
+		$f(n) = O(g(n))$
+		
+		\item $f(n) = \sqrt{n}$ and $g(n) = \log^3 (n)$ \\
+		$f(n) = \Omega(g(n))$
+		
+		\item $f(n) = n \log(n)$ and $g(n) = n^2$ \\
+		$f(n) = O(g(n))$
+	    \end{enumerate} 
+	\end{solution}
+
+\end{enumerate}
+%=====================================================
+% LaTeX Tip: Feel free to erase the Example/Hint parts when writing your solution if they are in the way (when doing so, make sure you do not erase the
+% other parts of LaTeX commands such as \end{enumerate} or \end{problem} -- however, please NEVER erase the problem statements. 
+%=====================================================		
+
+
+\end{problem}
+
+
+\smallskip
+
+
+		
+\begin{problem}
+	Your goal in this problem is to analyze the \emph{runtime} of the following (imaginary) recursive algorithms for some (even more imaginary) problem:
+	\begin{enumerate}[label=(\Alph*)]
+	
+		
+		\item  Algorithm $A$ divides an instance of size $n$ into $5$ subproblems of size $n/5$ each, recursively solves each one, and then takes $O(n)$ time 
+		to combine the solutions and output the answer.
+		
+		\begin{solution}
+			\item \textbf{Algorithm A:}
+			\[
+			T(n) = 5T\left(\frac{n}{5}\right) + O(n)
+			\]
+			Fits the Master Theorem with $a=5$, $b=5$, $f(n)=O(n)$. Since $n^{\log_b(a)} = n^{\log_5(5)} = n^1 = n$, and $f(n) = O(n)$, therefore:
+			\[
+			T(n) = O(n \log n)
+			\]
+		\end{solution}
+
+		\item Algorithm  Algorithm $B$ divides an instance of size $n$ into $5$ subproblems of size $n/2$ each, recursively solves each one, and then takes $O(n^2)$ time 
+		to combine the solutions and output the answer. 
+		 
+		
+		\begin{solution}
+			\item \textbf{Algorithm B:}  
+			\[
+			T(n) = 5T\left(\frac{n}{2}\right) + O(n^2)
+			\]
+			Fits the theorem with $a=5$, $b=2$, $f(n)=O(n^2)$. Since $n^{\log_b(a)} = n^{\log_2(5)} \approx n^{2.32}$, and $f(n) = O(n^2) = O(n^{\log_2(5) - \epsilon})$ for some $\epsilon > 0$, therefore:
+			\[
+			T(n) = O(n^{\log_2(5)}) \approx O(n^{2.32})
+			\]
+		\end{solution}
+
+		\item Algorithm $C$ divides an instance of size $n$ into $5$ subproblems of size $n/2$ each, recursively solves each one, and then takes $O(n^{0.8})$ time 
+		to combine the solutions and output the answer.  
+	    	\begin{solution}
+			\item \textbf{Algorithm C:}
+			\[
+			T(n) = 5T\left(\frac{n}{2}\right) + O(n^{0.8})
+			\]
+			Fits the Master Theorem with $a=5$, $b=2$, $f(n)=O(n^{0.8})$. Since $f(n) = O(n^{0.8}) = O(n^{\log_2(5) - \epsilon})$ for some $\epsilon > 0$, therefore:
+			\[
+			T(n) = O(n^{\log_2(5)}) \approx O(n^{2.32})
+			\]
+		\end{solution}
+
+\item $D$ divides an instance of size $n$ into $2$ subproblems, one with size $n/4$ and one with size $n/5$, recursively solves each one, and then takes $O(n)$ time 
+		to combine the solutions and output the answer.   	
+		
+		\begin{solution}
+			\item \textbf{Algorithm D:}
+			\[
+			T(n) = T\left(\frac{n}{4}\right) + T\left(\frac{n}{5}\right) + O(n)
+			\]
+			Does not fit the Master Theorem. Apply the Akra-Bazzi Theorem:
+			Solve $\left(\frac{1}{4}\right)^s + \left(\frac{1}{5}\right)^s = 1$ for $s$, which gives $s \approx 0.456$. Therefore:
+			\[
+			T(n) = \Theta(n^{0.456})
+			\]
+		\end{solution}
+
+\item Algorithm $E$ divides an instance of size $n$ in to $3$ subproblems of size $n-1$ each, recursively solves each one, and then takes $O(1)$ time to combine the solutions and output the answer. 	  	
+		
+		\begin{solution}
+			\item \textbf{Algorithm E:}
+			\[
+			T(n) = 3T(n-1) + O(1)
+			\]
+			This is a linear recurrence. We can solve it: $T(n) = 3T(n-1) + 1 = 3(3T(n-2) + 1) + 1 = 3^2T(n-2) + 3 + 1 = 3^3T(n-3) + 3^2 + 3 + 1 \ldots = 3^nT(0) + (3^{n-1} + 3^{n-2} + \ldots + 3 + 1)$. The sum is a geometric series with sum $(3^n - 1)/2$. Therefore:
+			\[
+			T(n) = O(3^n)
+			\]
+		\end{solution}
+
+
+	\end{enumerate}
+	
+	For each algorithm, write a recurrence for its runtime and \emph{use the recursion tree method} to solve this recurrence and find the \emph{tightest asymptotic} upper bound on runtime of the algorithm. \grade{25} 
+\end{problem}
+
+\smallskip
+
+\begin{problem}
+    Each of the algorithms below takes as input a positive integer $n$ and then performs some steps. For each algorithm, state the running time of the algorithm as a function of $n$, using $\Theta$-notation.\\ \grade{15}
+
+\begin{enumerate}[label =\alph*)]
+\item 
+\begin{itemize}
+	\item For $i = 1$ to $n/3$
+	\begin{itemize}
+		\item $j \gets 10$
+		\item While ($j \leq i/20$)
+		\begin{itemize}
+			\item Do placeholder stuff that takes $O(1)$ time
+			\item $j \gets j + 10$
+		\end{itemize}
+	\end{itemize}
+\end{itemize}
+
+ \begin{solution}
+	\item $\Theta(n^2)$ - outer loop runs $n$ times and an inner loop also runs $n$ times.
+\end{solution}
+
+
+\item 
+
+\begin{itemize}
+	\item While ($n \geq 1$)
+	\begin{itemize}
+		\item $n \gets n/3$
+		\item do placeholder stuff that takes $O(1)$ time.
+	\end{itemize}
+\end{itemize}
+ \begin{solution}
+	\item $\Theta(\log n)$ - division of $n$ by 3 leads to a logarithmic number of iterations
+\end{solution}
+
+\item 
+\begin{itemize}
+\item While ($n \geq 2$)
+\begin{itemize}
+	\item $n \gets \sqrt{n}$
+	\item Do placeholder stuff that takes $O(1)$ time.
+\end{itemize}
+\end{itemize}
+
+ \begin{solution}
+	\item $\Theta(\log \log n)$ - repeated square rooting is applied, reducing problem size logarithmically at a double rate. 
+\end{solution}
+
+\item 
+
+\begin{itemize}
+	\item For $i = 1$ to $n$
+	\begin{itemize}
+		\item For $j = 1$ to $i^2$
+		\begin{itemize}
+			\item Do placeholder stuff that takes $O(1)$ time
+		\end{itemize}
+	\end{itemize}
+	\end{itemize}
+ \begin{solution}
+	\item $\Theta(n^3)$ - outer loop runs $n$ times and inner loop runs $n^2$ times, combining to $n \times n^2$ iterations. 
+\end{solution}
+
+\item 
+\begin{itemize}
+	\item For $i = 1$ to $n$
+	\begin{itemize}
+		\item For $j = 1$ to $\log(i)$
+		\begin{itemize}
+			\item For $k = 1$ to $n$
+			\begin{itemize}
+				\item Do placeholder stuff that takes $O(1)$ time
+			\end{itemize}
+			\end{itemize}
+		\end{itemize}
+	\end{itemize}
+ \begin{solution}
+	\item $\Theta(n^2 \log n)$ - outer loop runs $n$ times, a middle loop runs $\log n$ times, and the inner loop runs $n$ times. 
+\end{solution}
+
+\end{enumerate}
+
+\end{problem}
+
+
+
+\begin{problem}
+	In this problem, we consider a non-standard sorting algorithm called the \emph{Slow Sort}. Given an array $A[1:n]$ of $n$ integers, the algorithm is as follows: 
+	
+	$\bullet$ \textbf{Slow-Sort}$(A[1:n])$:
+	\begin{enumerate}
+		\item If $n < 100$, run merge sort (or selection sort or insertion sort) on $A$.  
+		\item Otherwise, run \textbf{Slow-Sort}$(A[1:n-1])$, \textbf{Slow-Sort}$(A[2:n])$, and \textbf{Slow-Sort}$(A[1:n-1])$ again. 
+	\end{enumerate} 
+	
+	We now analyze this algorithm. 
+	
+	
+	\begin{enumerate}
+		\item [(a)] Prove the correctness of  \textbf{Slow-Sort}. \grade{15} 
+		
+		\begin{solution}
+			\textbf{Proof by Induction:}
+
+			\textbf{Base case:} When $n < 100$, the algorithm uses a sorting algorithm to sort $A[1:n]$.
+			
+			\textbf{Inductive step:} For $n \geq 100$, we need to show that after executing the three recursive calls, the array $A[1:n]$ is sorted.
+			\begin{itemize}
+				\item From the 1st \& 3rd Recursive calls: $A[1:n-1]$ is sorted, so $A[n-2] \leq A[n-1]$.
+				\item From the second Recursive call: we know $A[n-1] \leq A[n]$ because $A[2:n]$ is sorted.
+			\end{itemize}
+			Combine these, we have: $A[1] \leq A[2] \leq \ldots \leq A[n-1] \leq A[n]$ - the array is now sorted after the three recursive calls. 
+		\end{solution}
+
+			\item [(b)] Write a recurrence for  \textbf{Slow-Sort} and use the recursion tree method to solve this recurrence and find the \emph{tightest asymptotic} upper bound on the runtime of \textbf{Slow-Sort}. \grade{10}
+	
+		\begin{solution}
+			\textbf{Recurrence and tightest asymptotic upper bound on runtime:}
+			\begin{itemize}
+				\item For $n < 100$:
+				\[
+				T(n) = O(1)
+				\]
+				\item For $n \geq 100$:
+				\[
+				T(n) = 3T(n-1) + O(1)
+				\]
+				\[
+				T(n) = 3^{(n-99)} T(99) + \left(\frac{3^{(n-99)} - 1}{2}\right)
+				\]
+				\[
+				T(n) = O(3^{(n-99)}) \times O(3^{(n-99)})
+				\]
+				Asymptotic Upper Bound:
+				\[
+				T(n) = O(3^n)
+				\]
+			\end{itemize}
+		\end{solution}
+
+	\end{enumerate}
+\end{problem}
+
+\smallskip
+
+\begin{problem}
+    Karatsuba multiplication reduces the time complexity of multiplying two $n$-digit numbers to $O(n^{\log_2 3}) \approx O(n^{1.585})$, using the recurrence:
+\[
+T(n) = 3T(n/2) + O(n)
+\]
+The algorithm splits the numbers as follows:
+\[
+x = x_1 \cdot 10^{n/2} + x_0, \quad y = y_1 \cdot 10^{n/2} + y_0
+\]
+and computes three products: $x_0 \cdot y_0$, $x_1 \cdot y_1$, and $(x_0 + x_1) \cdot (y_0 + y_1)$.
+
+
+Two values you are multiplying might be n/2 + 1 digits each, rather than n/2 digits, since the addition might have led to a carry. For instance compute $(x_1 + x_0)(y_1 + y_0)$ for $x = 53$ and $y = 52$. Notice the carry and the extra digit. So the recurrence will be \[
+T(n) = 2T(n/2) + T(n/2+1) + O(n)
+\]
+
+Prove that this issue won't affect our analysis and we still $O(n^{\log_2 3})$ complexity. \grade{20}
+
+\begin{solution}
+	\textbf{Analysis of Recurrence Relations:}
+
+	\textbf{Original recurrence:}
+	\[
+	T(n) = 3T\left(\frac{n}{2}\right) + O(n)
+	\]
+	
+	\textbf{Modified recurrence:}
+	\[
+	T(n) = 2T\left(\frac{n}{2}\right) + T\left(\frac{n}{2} + 1\right) + O(n)
+	\]
+	
+	\textbf{Proving (Induction) that the modified recurrence still leads to the same asymptotic bound:}
+	
+	Assume \( T(k) \leq c k^{\log_2 3} \) for all \( k < n \).
+	
+	\[
+	T(n) \leq 2T\left(\frac{n}{2}\right) + T\left(\frac{n}{2} + 1\right) + dn
+	\]
+	
+	\[
+	\leq 2c\left(\frac{n}{2}\right)^{\log_2 3} + c\left(\frac{n}{2} + 1\right)^{\log_2 3} + dn
+	\]
+	
+	\[
+	\leq 2c\left(\frac{n}{2}\right)^{\log_2 3} + c\left(\frac{n}{2} \times \left(1 + \frac{2}{n}\right)\right)^{\log_2 3} + dn \quad \text{(since } \frac{n}{2} + 1 \leq \frac{n}{2} \times \left(1 + \frac{2}{n}\right) \text{ for } n \geq 2\text{)}
+	\]
+	
+	\[
+	\leq 2c\left(\frac{n}{2}\right)^{\log_2 3} + c\left(\frac{n}{2}\right)^{\log_2 3} \times \left(1 + \frac{2}{n}\right)^{\log_2 3} + dn
+	\]
+	
+	\[
+	\leq 2c\left(\frac{n}{2}\right)^{\log_2 3} + c\left(\frac{n}{2}\right)^{\log_2 3} \times \left(1 + \frac{2\log_2 3}{n}\right) + dn \quad \text{(via binomial approximation)}
+	\]
+	
+	\[
+	= c\left(\frac{n}{2}\right)^{\log_2 3} \times \left(2 + 1 + \frac{2\log_2 3}{n}\right) + dn
+	\]
+	
+	\[
+	= cn^{\log_2 3} \times \left(\frac{3}{2^{\log_2 3}} + \frac{2\log_2 3}{n^{\log_2 3}}\right) + dn
+	\]
+	
+	\[
+	\leq cn^{\log_2 3} \times \left(1 + \frac{2\log_2 3}{n^{\log_2 3}}\right) + dn \quad \text{(since } \frac{3}{2^{\log_2 3}} = 1\text{)}
+	\]
+	
+	\textbf{For large \( n \):}
+	\[
+	\frac{2\log_2 3}{n^{\log_2 3}} < \epsilon \quad \text{(for any small } \epsilon > 0\text{)}
+	\]
+	\[
+	dn < (\epsilon)cn^{\log_2 3}.
+	\]
+	
+	The recurrence \( T(n) = 2T\left(\frac{n}{2}\right) + T\left(\frac{n}{2} + 1\right) + O(n) \) can be upper-bounded by:
+	\[
+	T(n) \leq 3T\left(\frac{n}{2}\right) + O(n)
+	\]
+	This fits case 2 of Master Theorem with \( a = 3 \), \( b = 2 \), and \( f(n) = O(n) \), since \( f(n) = O(n) = O(n^{\log_2 3}) \), proving that the modified recurrence does not affect the complexity.
+\end{solution}
+
+
+\end{problem}
+
+\begin{problem}
+Toom-Cook multiplication generalizes Karatsuba by dividing numbers into more parts. The Toom-3 algorithm splits two $n$-digit numbers $x$ and $y$ into three smaller parts:
+\[
+x = x_2 \cdot 10^{2k} + x_1 \cdot 10^k + x_0, \quad y = y_2 \cdot 10^{2k} + y_1 \cdot 10^k + y_0
+\]
+
+If we multiply we need to perform $9$  multiplications $x_iy_j$ of size $n/3$.
+
+\begin{enumerate}
+    \item Write down the recurrence relation for the time complexity of the simple divide and conquer algorithm and solve it.
+
+\item Toom-3 algorithm instead only uses $5$ smaller multiplications to calculate all the $9$ products needed. Find the time complexity of Toom-3.
+    
+\end{enumerate}
+
+\end{problem}\grade{20}
+\begin{solution}
+	\textbf{For divide and conquer approach, 9 multiplications of size \( \frac{n}{3} \):}
+	\[
+	T(n) = 9T\left(\frac{n}{3}\right) + O(n)
+	\]
+	Applying the Master Theorem, Case 1:
+	\begin{itemize}
+	    \item \( a = 9 \), \( b = 3 \), \( f(n) = O(n) \)
+	    \item \( \log_b(a) = \log_3(9) = 2 \)
+	\end{itemize}
+	Thus, the solution to the recurrence is:
+	\[
+	T(n) = \Theta\left(n^{\log_3(9)}\right) = \Theta(n^2)
+	\]
+	
+	\textbf{Time complexity of Toom-3:}
+	\[
+	T(n) = 5T\left(\frac{n}{3}\right) + O(n) \quad \text{(5 multiplications instead of 9)}
+	\]
+	Applying the Master Theorem, Case 1:
+	\begin{itemize}
+	    \item \( a = 5 \), \( b = 3 \), \( f(n) = O(n) \)
+	    \item \( \log_b(a) = \log_3(5) \approx 1.465 \)
+	\end{itemize}
+	Thus, the solution to the recurrence is:
+	\[
+	T(n) = \Theta\left(n^{\log_3(5)}\right) \approx \Theta(n^{1.465}) \quad \text{(faster approach)}
+	\]
+\end{solution}
+
+
+\smallskip
+\begin{problem}
+	Merge Sort usually splits an array into two equal halves. However, consider a version where the array is split into parts of size $ 2n/3 $ and $n/3$.
+
+\begin{enumerate}[label=\alph*)]
+\item Write the recurrence relation for the time complexity of Merge Sort with this unequal split.
+    \item Solve the recurrence and find the time complexity.
+    
+\end{enumerate}
+
+
+\end{problem}
+\grade{20}
+\begin{solution}
+	\textbf{Recursive Split:}
+	\begin{itemize}
+	\item One part of size \( \frac{2n}{3} \)
+	\item Another part of size \( \frac{n}{3} \)
+	\end{itemize}
+
+	\textbf{Recurrence Relation:}
+	\[
+	T(n) = T\left(\frac{2n}{3}\right) + T\left(\frac{n}{3}\right) + cn \quad (O(n))
+	\]
+
+	\textbf{Recursion Tree Analysis:}
+	\begin{itemize}
+	\item \textbf{Level 0:} \( cn \)
+	\item \textbf{Level 1:} \( c\left(\frac{2n}{3}\right) + c\left(\frac{n}{3}\right) = cn \)
+	\item \textbf{Level 2:} \( c\left(\frac{4n}{9}\right) + c\left(\frac{2n}{9}\right) + c\left(\frac{2n}{9}\right) + c\left(\frac{n}{9}\right) = cn \)
+	\end{itemize}
+	All levels have the same total cost \( cn \).
+
+	\textbf{Height of Tree:}
+	\begin{itemize}
+	\item \( n\left(\frac{2}{3}\right)^k = 1 \)
+	\item \( \left(\frac{2}{3}\right)^k = \frac{1}{n} \)
+	\item \( k = \log_{\frac{3}{2}}(n) = \frac{\log(n)}{\log\left(\frac{3}{2}\right)} \)
+	\end{itemize}
+
+	\textbf{Total cost} = cost per level \(\times\) number of levels 
+	\[
+	= cn \times \log_{\frac{3}{2}}(n) = O(n \log n) \quad \text{(Same as standard Merge Sort)}
+	\]
+\end{solution}
+
+%=====================================================
+% LaTeX Tip: For problems that have a single part, write your solutions  in a solution environment, i.e., between a \begin{solution} and \end{solution} command, and define this command write AFTER the problem statement. 
+%=====================================================	
+
+\smallskip
+
+\begin{problem} Consdier the problem of computing the Fibonacci numbers:
+
+$$
+F_0=0, F_1=1, F_n=F_{n-1}+F_{n-2}
+$$
+
+
+    \begin{enumerate}[label =\alph *)]
+        \item Write an algorithm to compute the Fibonacci number $F_n$ with $O(n)$ additions.
+
+Note that $F_n$ grows exponentially and has $\Theta(n)$ digits which means that the additions operation $F_n + F_{n+1}$ actually takes $O(n)$ time. Compute the time complexity of the algorithm.
+
+\item We start by writing the equations $F_1=F_1$ and $F_2=F_0+F_1$ in matrix notation:
+
+$$
+\binom{F_1}{F_2}=\left(\begin{array}{ll}
+0 & 1 \\
+1 & 1
+\end{array}\right) \cdot\binom{F_0}{F_1}
+$$
+
+
+Similarly,
+
+$$
+\binom{F_2}{F_3}=\left(\begin{array}{ll}
+0 & 1 \\
+1 & 1
+\end{array}\right) \cdot\binom{F_1}{F_2}=\left(\begin{array}{ll}
+0 & 1 \\
+1 & 1
+\end{array}\right)^2 \cdot\binom{F_0}{F_1}
+$$
+
+In general,
+
+$$
+\binom{F_n}{F_{n+1}}=\left(\begin{array}{ll}
+0 & 1 \\
+1 & 1
+\end{array}\right)^n \cdot\binom{F_0}{F_1}
+$$
+
+
+So, in order to compute $F_n$, it suffices to raise this $2 \times 2$ matrix, call it $X$, to the $n$th power.
+
+\begin{enumerate}[label =\roman*)]
+    \item Show that $O(\log n)$ matrix multiplications suffice for computing $X^n$ by repeated squaring. Note that two $2 \times 2$ matrices can be multiplied using 4 additions and 8 multiplications.
+    \item Let $M(n)$ be the running time of an algorithm for multiplying $n$-bit numbers. Prove that the running time of this second algorithm is $O(M(n)\log n)$.
+\end{enumerate}
+
+
+\end{enumerate}
+\end{problem}\grade{20}
+
+\begin{solution}
+    
+	\textbf{a) Algorithm to Compute \( F_n \) with \( O(n) \) additions:}
+
+	\begin{verbatim}
+	Initialize F0 = 0
+	Initialize F1 = 1
+	For i = 2 to n: Fi = Fi-1 + Fi-2
+	Return Fn
+	\end{verbatim}
+	
+	\textbf{Analysis:}
+	\begin{itemize}
+	    \item The loop runs \( n-1 \) times.
+	    \item Each addition takes \( O(i) \) time.
+	    \item Total time: \( O(1 + 2 + 3 + \ldots + n) = O(n^2) \).
+	\end{itemize}
+	
+	\textbf{bi) Computing \( X^n \) by repeated squaring:}
+	
+	\begin{verbatim}
+	Initialize I = identity matrix and X = given matrix
+	While n > 0: 
+	    If n is odd: result = result * X 
+	    X = X * X 
+	    n = n / 2 (floor)
+	Return result
+	\end{verbatim}
+	
+	\textbf{Analysis:}
+	\begin{itemize}
+	    \item The while loop runs \( O(\log n) \) times.
+	    \item In each iteration, we perform a maximum of 2 matrix multiplications.
+	    \item Total number of matrix multiplications: \( O(\log n) \).
+	\end{itemize}
+	
+	\textbf{bii) Running time:}
+	\begin{itemize}
+	    \item The Fibonacci numbers have \( O(n) \) bits.
+	    \item We must perform \( O(\log n) \) matrix multiplications.
+	    \item The time for one matrix multiplication is \( O(M(n)) \).
+	    \item Therefore, the total time complexity is: \( O(M(n) \log n) \).
+	\end{itemize}
+   
+\end{solution}
+\finishline
+
+\begin{challenge}
+We have an $n$-story building and a series of magical vases that work as follows: there is some unknown level $L$ in the building that if we throw these vases down from any of the levels $L,L+1,\ldots,n$, they will definitely break; however, 
+	no matter how many times we throw the vases down from any level below $L$ nothing will happen them. Our goal in this question is to determine this level $L$ by throwing the vases from different levels of the building (!). 
+	
+	For each of the scenarios below, design an algorithm that uses asymptotically the smallest number of times we throw a vase (so the measure of efficiency for us is the number of vase throws). 
+	\begin{enumerate}
+	\item[(a)] When we have only one vase. Once we break the vase, there is nothing else we can do. \grade{+2} 
+	
+	
+    	\begin{solution}
+		\textbf{a) Case 1: Only 1 Vase - Linear Search}
+		\begin{itemize}
+		\item \textbf{Algorithm:}
+		\begin{enumerate}
+			\item Start at the first floor.
+			\item Throw the vase from each floor, then move up one floor.
+			\item Return the floor number when the vase breaks.
+		\end{enumerate}
+		\item \textbf{Worst Case:} The worst case is \( n \) number of throws, where \( n \) is the number of floors.
+		\end{itemize}
+	\end{solution}
+
+
+	\item[(b)] When we have  four vases. Once we break all four vases, there is nothing else we can do. \grade{+4} 
+	
+	
+    	\begin{solution}
+		\textbf{b) Case 2: Four Vases - Divide and Conquer}
+		\begin{itemize}
+		    \item \textbf{Algorithm:}
+		    \begin{enumerate}
+			\item Divide the building into 5 approximately equal sections.
+			\item Throw vases from the 4 dividing points.
+			\item If a vase breaks at floor \( i \times \frac{n}{5} \), search linearly in that range.
+			\item If no vase breaks, search linearly in the top section.
+		    \end{enumerate}
+		    \item \textbf{Worst-case number of throws:} \( 4 + \frac{n}{5} \) which approximates to \( \frac{n}{5} \).
+		\end{itemize}
+	\end{solution}
+
+
+	\item[(c)] When we have an unlimited number of vases.  \grade{+4} 
+	
+	
+    	\begin{solution}
+		\textbf{c) Case 3: Unlimited Vases - Binary Search}
+		\begin{itemize}
+		    \item \textbf{Algorithm:}
+		    \begin{enumerate}
+			\item Set \( \text{low} = 1 \) and \( \text{high} = n \).
+			\item While \( \text{low} < \text{high} \):
+			\begin{itemize}
+			    \item Calculate \( \text{mid} = (\text{low} + \text{high}) / 2 \).
+			    \item Throw a vase from floor \( \text{mid} \).
+			    \item If it breaks, set \( \text{high} = \text{mid} - 1 \).
+			    \item Else, set \( \text{low} = \text{mid} + 1 \).
+			\end{itemize}
+			\item Return \( \text{low} \) (equal to \( L \), the critical floor).
+		    \end{enumerate}
+		    \item \textbf{Worst-case number of throws:} \( \log(n) \).
+		\end{itemize}
+	\end{solution}
+
+
+	\end{enumerate}
+\end{challenge}
+
+
+\end{document}
+
+
+
+
+
